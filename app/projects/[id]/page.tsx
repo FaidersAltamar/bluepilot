@@ -68,7 +68,7 @@ export default function Page({ params }: any) {
               Project not found
             </h1>
             <p className="text-slate-500 dark:text-slate-400">
-              Sorry, we couldn't find the project you're looking for.
+              Sorry, we couldn&apos;t find the project you&apos;re looking for.
             </p>
             <div className="flex gap-4 mt-2">
               <Link href="/">
