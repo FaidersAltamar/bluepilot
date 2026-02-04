@@ -1,0 +1,2965 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "IA Gateway API",
+    "version": "1.0.0",
+    "description": "Gateway unificado para múltiples proveedores de IA. Compatible con OpenAI SDK y herramientas estándar.",
+    "contact": {
+      "name": "IA Gateway Support"
+    },
+    "license": {
+      "name": "MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://lczfswkznwssvnjtexpp.supabase.co/functions/v1",
+      "description": "Production Server"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "OpenAI",
+      "description": "Proxy 100% compatible con OpenAI SDK"
+    },
+    {
+      "name": "DeepSeek",
+      "description": "Modelos DeepSeek con razonamiento avanzado"
+    },
+    {
+      "name": "Groq",
+      "description": "Inferencia ultra-rápida con LPU™"
+    },
+    {
+      "name": "Gemini",
+      "description": "Modelos multimodales de Google"
+    },
+    {
+      "name": "Cerebras",
+      "description": "Inferencia ultra-rápida en hardware de obleas"
+    },
+    {
+      "name": "ElevenLabs",
+      "description": "Síntesis de voz y audio de alta calidad"
+    },
+    {
+      "name": "OpenRouter",
+      "description": "Meta-proveedor con acceso a múltiples modelos"
+    },
+    {
+      "name": "Perplexity",
+      "description": "Búsqueda con IA en tiempo real"
+    },
+    {
+      "name": "Stability",
+      "description": "Generación de imágenes y video"
+    },
+    {
+      "name": "Anthropic",
+      "description": "Claude - Modelos conversacionales avanzados de Anthropic"
+    },
+    {
+      "name": "Firecrawl",
+      "description": "Web scraping, crawling y extracción de datos"
+    },
+    {
+      "name": "Apify",
+      "description": "Automatización web y actores para scraping"
+    },
+    {
+      "name": "Moonshot",
+      "description": "Modelos Kimi con contexto largo (128K tokens)"
+    },
+    {
+      "name": "Qwen",
+      "description": "Modelos Qwen de Alibaba Cloud"
+    },
+    {
+      "name": "PeopleSearch",
+      "description": "Búsqueda de información pública de personas"
+    },
+    {
+      "name": "Research",
+      "description": "Investigación profunda con múltiples fuentes"
+    },
+    {
+      "name": "StructuredOutput",
+      "description": "Extracción de datos estructurados con JSON Schema"
+    }
+  ],
+  "paths": {
+    "/openai/chat/completions": {
+      "post": {
+        "tags": [
+          "OpenAI"
+        ],
+        "summary": "Chat Completions",
+        "description": "Genera respuestas de chat usando modelos GPT. Soporta streaming, function calling, JSON mode y visión.",
+        "operationId": "openaiChatCompletions",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatCompletionRequest"
+              },
+              "examples": {
+                "basic": {
+                  "summary": "Chat básico",
+                  "value": {
+                    "model": "gpt-4o",
+                    "messages": [
+                      {
+                        "role": "user",
+                        "content": "¿Cuál es la capital de Francia?"
+                      }
+                    ]
+                  }
+                },
+                "streaming": {
+                  "summary": "Con streaming",
+                  "value": {
+                    "model": "gpt-4o-mini",
+                    "messages": [
+                      {
+                        "role": "user",
+                        "content": "Escribe un poema corto"
+                      }
+                    ],
+                    "stream": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Respuesta exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatCompletionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado"
+          },
+          "429": {
+            "description": "Límite de tasa excedido"
+          }
+        }
+      }
+    },
+    "/openai/models": {
+      "get": {
+        "tags": [
+          "OpenAI"
+        ],
+        "summary": "List Models",
+        "description": "Lista todos los modelos disponibles en OpenAI.",
+        "operationId": "openaiListModels",
+        "responses": {
+          "200": {
+            "description": "Lista de modelos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string",
+                      "example": "list"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/openai/images/generations": {
+      "post": {
+        "tags": [
+          "OpenAI"
+        ],
+        "summary": "Image Generation",
+        "description": "Genera imágenes usando DALL-E 2, DALL-E 3 o gpt-image-1.",
+        "operationId": "openaiImageGeneration",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImageGenerationRequest"
+              },
+              "example": {
+                "prompt": "Un gato astronauta en el espacio",
+                "model": "dall-e-3",
+                "size": "1024x1024",
+                "quality": "hd"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Imagen generada exitosamente"
+          }
+        }
+      }
+    },
+    "/openai/audio/speech": {
+      "post": {
+        "tags": [
+          "OpenAI"
+        ],
+        "summary": "Text to Speech",
+        "description": "Convierte texto a audio usando TTS.",
+        "operationId": "openaiTTS",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TTSRequest"
+              },
+              "example": {
+                "model": "tts-1-hd",
+                "input": "Hola, ¿cómo estás?",
+                "voice": "nova"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Audio generado",
+            "content": {
+              "audio/mpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/openai/audio/transcriptions": {
+      "post": {
+        "tags": [
+          "OpenAI"
+        ],
+        "summary": "Audio Transcription",
+        "description": "Transcribe audio a texto usando Whisper.",
+        "operationId": "openaiTranscription",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file",
+                  "model"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Archivo de audio"
+                  },
+                  "model": {
+                    "type": "string",
+                    "example": "whisper-1"
+                  },
+                  "language": {
+                    "type": "string",
+                    "description": "Código ISO-639-1"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Transcripción exitosa"
+          }
+        }
+      }
+    },
+    "/openai/embeddings": {
+      "post": {
+        "tags": [
+          "OpenAI"
+        ],
+        "summary": "Create Embeddings",
+        "description": "Genera embeddings vectoriales de texto.",
+        "operationId": "openaiEmbeddings",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmbeddingRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Embeddings generados"
+          }
+        }
+      }
+    },
+    "/deepseek/chat/completions": {
+      "post": {
+        "tags": [
+          "DeepSeek"
+        ],
+        "summary": "Chat Completions",
+        "description": "Genera respuestas usando DeepSeek. Soporta modo de razonamiento con deepseek-reasoner.",
+        "operationId": "deepseekChatCompletions",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatCompletionRequest"
+              },
+              "examples": {
+                "chat": {
+                  "summary": "Chat estándar",
+                  "value": {
+                    "model": "deepseek-chat",
+                    "messages": [
+                      {
+                        "role": "user",
+                        "content": "Explica la relatividad"
+                      }
+                    ]
+                  }
+                },
+                "reasoning": {
+                  "summary": "Con razonamiento",
+                  "value": {
+                    "model": "deepseek-reasoner",
+                    "messages": [
+                      {
+                        "role": "user",
+                        "content": "Resuelve: 2x + 5 = 13"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Respuesta exitosa"
+          }
+        }
+      }
+    },
+    "/deepseek/models": {
+      "get": {
+        "tags": [
+          "DeepSeek"
+        ],
+        "summary": "List Models",
+        "operationId": "deepseekListModels",
+        "responses": {
+          "200": {
+            "description": "Lista de modelos"
+          }
+        }
+      }
+    },
+    "/deepseek/completions": {
+      "post": {
+        "tags": [
+          "DeepSeek"
+        ],
+        "summary": "FIM Completions",
+        "description": "Fill-in-the-Middle para completar código.",
+        "operationId": "deepseekFIM",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "model",
+                  "prompt"
+                ],
+                "properties": {
+                  "model": {
+                    "type": "string"
+                  },
+                  "prompt": {
+                    "type": "string",
+                    "description": "Código antes del cursor"
+                  },
+                  "suffix": {
+                    "type": "string",
+                    "description": "Código después del cursor"
+                  },
+                  "max_tokens": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Código completado"
+          }
+        }
+      }
+    },
+    "/groq/chat/completions": {
+      "post": {
+        "tags": [
+          "Groq"
+        ],
+        "summary": "Chat Completions",
+        "description": "Chat ultra-rápido con modelos Llama, Mixtral o Gemma.",
+        "operationId": "groqChatCompletions",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatCompletionRequest"
+              },
+              "example": {
+                "model": "llama-3.3-70b-versatile",
+                "messages": [
+                  {
+                    "role": "user",
+                    "content": "Hola"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Respuesta exitosa"
+          }
+        }
+      }
+    },
+    "/groq/models": {
+      "get": {
+        "tags": [
+          "Groq"
+        ],
+        "summary": "List Models",
+        "operationId": "groqListModels",
+        "responses": {
+          "200": {
+            "description": "Lista de modelos"
+          }
+        }
+      }
+    },
+    "/groq/audio/transcriptions": {
+      "post": {
+        "tags": [
+          "Groq"
+        ],
+        "summary": "Audio Transcription",
+        "description": "Transcribe audio con velocidad Groq.",
+        "operationId": "groqTranscription",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "model": {
+                    "type": "string",
+                    "example": "whisper-large-v3"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Transcripción exitosa"
+          }
+        }
+      }
+    },
+    "/gemini/models/{model}:generateContent": {
+      "post": {
+        "tags": [
+          "Gemini"
+        ],
+        "summary": "Generate Content",
+        "description": "Genera contenido multimodal (texto, imágenes, audio, video).",
+        "operationId": "geminiGenerateContent",
+        "parameters": [
+          {
+            "name": "model",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "gemini-2.0-flash"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "contents"
+                ],
+                "properties": {
+                  "contents": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "systemInstruction": {
+                    "type": "object"
+                  },
+                  "generationConfig": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Contenido generado"
+          }
+        }
+      }
+    },
+    "/gemini/models/{model}:streamGenerateContent": {
+      "post": {
+        "tags": [
+          "Gemini"
+        ],
+        "summary": "Stream Generate Content",
+        "description": "Genera contenido con streaming.",
+        "operationId": "geminiStreamContent",
+        "parameters": [
+          {
+            "name": "model",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Stream de contenido"
+          }
+        }
+      }
+    },
+    "/gemini/models": {
+      "get": {
+        "tags": [
+          "Gemini"
+        ],
+        "summary": "List Models",
+        "operationId": "geminiListModels",
+        "responses": {
+          "200": {
+            "description": "Lista de modelos"
+          }
+        }
+      }
+    },
+    "/cerebras/chat/completions": {
+      "post": {
+        "tags": [
+          "Cerebras"
+        ],
+        "summary": "Chat Completions",
+        "description": "Inferencia ultra-rápida en hardware de obleas.",
+        "operationId": "cerebrasChatCompletions",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatCompletionRequest"
+              },
+              "example": {
+                "model": "llama3.3-70b",
+                "messages": [
+                  {
+                    "role": "user",
+                    "content": "Hola"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Respuesta exitosa"
+          }
+        }
+      }
+    },
+    "/cerebras/models": {
+      "get": {
+        "tags": [
+          "Cerebras"
+        ],
+        "summary": "List Models",
+        "operationId": "cerebrasListModels",
+        "responses": {
+          "200": {
+            "description": "Lista de modelos"
+          }
+        }
+      }
+    },
+    "/elevenlabs/text-to-speech/{voice_id}": {
+      "post": {
+        "tags": [
+          "ElevenLabs"
+        ],
+        "summary": "Text to Speech",
+        "description": "Genera audio de alta calidad desde texto.",
+        "operationId": "elevenlabsTTS",
+        "parameters": [
+          {
+            "name": "voice_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "JBFqnCBsd6RMkjVDRZzb"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "text"
+                ],
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "model_id": {
+                    "type": "string",
+                    "example": "eleven_multilingual_v2"
+                  },
+                  "voice_settings": {
+                    "type": "object",
+                    "properties": {
+                      "stability": {
+                        "type": "number"
+                      },
+                      "similarity_boost": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Audio generado"
+          }
+        }
+      }
+    },
+    "/elevenlabs/voices": {
+      "get": {
+        "tags": [
+          "ElevenLabs"
+        ],
+        "summary": "List Voices",
+        "operationId": "elevenlabsListVoices",
+        "responses": {
+          "200": {
+            "description": "Lista de voces"
+          }
+        }
+      }
+    },
+    "/elevenlabs/speech-to-text": {
+      "post": {
+        "tags": [
+          "ElevenLabs"
+        ],
+        "summary": "Speech to Text",
+        "description": "Transcribe audio a texto.",
+        "operationId": "elevenlabsSTT",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Transcripción"
+          }
+        }
+      }
+    },
+    "/elevenlabs/sound-generation": {
+      "post": {
+        "tags": [
+          "ElevenLabs"
+        ],
+        "summary": "Sound Generation",
+        "description": "Genera efectos de sonido desde texto.",
+        "operationId": "elevenlabsSoundGen",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sonido generado"
+          }
+        }
+      }
+    },
+    "/openrouter/chat/completions": {
+      "post": {
+        "tags": [
+          "OpenRouter"
+        ],
+        "summary": "Chat Completions",
+        "description": "Acceso a múltiples modelos (Claude, GPT, Llama, etc.).",
+        "operationId": "openrouterChatCompletions",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatCompletionRequest"
+              },
+              "examples": {
+                "claude": {
+                  "summary": "Usar Claude",
+                  "value": {
+                    "model": "anthropic/claude-sonnet-4-5",
+                    "messages": [
+                      {
+                        "role": "user",
+                        "content": "Hola"
+                      }
+                    ]
+                  }
+                },
+                "llama": {
+                  "summary": "Usar Llama",
+                  "value": {
+                    "model": "meta-llama/llama-3.3-70b-instruct",
+                    "messages": [
+                      {
+                        "role": "user",
+                        "content": "Hola"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Respuesta exitosa"
+          }
+        }
+      }
+    },
+    "/openrouter/models": {
+      "get": {
+        "tags": [
+          "OpenRouter"
+        ],
+        "summary": "List Models",
+        "operationId": "openrouterListModels",
+        "responses": {
+          "200": {
+            "description": "Lista de modelos"
+          }
+        }
+      }
+    },
+    "/perplexity/chat/completions": {
+      "post": {
+        "tags": [
+          "Perplexity"
+        ],
+        "summary": "Chat with Search",
+        "description": "Chat con búsqueda en tiempo real de internet.",
+        "operationId": "perplexityChatCompletions",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ChatCompletionRequest"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "search_domain_filter": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "search_recency_filter": {
+                        "type": "string",
+                        "enum": [
+                          "day",
+                          "week",
+                          "month",
+                          "year"
+                        ]
+                      },
+                      "return_citations": {
+                        "type": "boolean"
+                      },
+                      "return_related_questions": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                ]
+              },
+              "example": {
+                "model": "sonar-pro",
+                "messages": [
+                  {
+                    "role": "user",
+                    "content": "¿Cuáles son las últimas noticias de IA?"
+                  }
+                ],
+                "return_citations": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Respuesta con citaciones"
+          }
+        }
+      }
+    },
+    "/perplexity/models": {
+      "get": {
+        "tags": [
+          "Perplexity"
+        ],
+        "summary": "List Models",
+        "operationId": "perplexityListModels",
+        "responses": {
+          "200": {
+            "description": "Lista de modelos"
+          }
+        }
+      }
+    },
+    "/stability/generate/sd3": {
+      "post": {
+        "tags": [
+          "Stability"
+        ],
+        "summary": "Stable Diffusion 3",
+        "description": "Genera imágenes con Stable Diffusion 3.",
+        "operationId": "stabilitySD3",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "prompt"
+                ],
+                "properties": {
+                  "prompt": {
+                    "type": "string"
+                  },
+                  "negative_prompt": {
+                    "type": "string"
+                  },
+                  "aspect_ratio": {
+                    "type": "string",
+                    "enum": [
+                      "1:1",
+                      "16:9",
+                      "9:16",
+                      "4:3",
+                      "3:4"
+                    ]
+                  },
+                  "output_format": {
+                    "type": "string",
+                    "enum": [
+                      "png",
+                      "jpeg",
+                      "webp"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Imagen generada"
+          }
+        }
+      }
+    },
+    "/stability/generate/ultra": {
+      "post": {
+        "tags": [
+          "Stability"
+        ],
+        "summary": "Stable Image Ultra",
+        "description": "Máxima calidad de imagen con Stable Image Ultra.",
+        "operationId": "stabilityUltra",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "prompt": {
+                    "type": "string"
+                  },
+                  "negative_prompt": {
+                    "type": "string"
+                  },
+                  "aspect_ratio": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Imagen generada"
+          }
+        }
+      }
+    },
+    "/stability/edit/inpaint": {
+      "post": {
+        "tags": [
+          "Stability"
+        ],
+        "summary": "Inpainting",
+        "description": "Edita partes de una imagen con una máscara.",
+        "operationId": "stabilityInpaint",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "mask": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "prompt": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Imagen editada"
+          }
+        }
+      }
+    },
+    "/stability/edit/outpaint": {
+      "post": {
+        "tags": [
+          "Stability"
+        ],
+        "summary": "Outpainting",
+        "description": "Extiende una imagen más allá de sus bordes.",
+        "operationId": "stabilityOutpaint",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "prompt": {
+                    "type": "string"
+                  },
+                  "left": {
+                    "type": "integer"
+                  },
+                  "right": {
+                    "type": "integer"
+                  },
+                  "up": {
+                    "type": "integer"
+                  },
+                  "down": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Imagen extendida"
+          }
+        }
+      }
+    },
+    "/stability/image-to-video": {
+      "post": {
+        "tags": [
+          "Stability"
+        ],
+        "summary": "Image to Video",
+        "description": "Anima una imagen estática en video.",
+        "operationId": "stabilityImageToVideo",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "cfg_scale": {
+                    "type": "number"
+                  },
+                  "motion_bucket_id": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Video generado"
+          }
+        }
+      }
+    },
+    "/anthropic/messages": {
+      "post": {
+        "tags": [
+          "Anthropic"
+        ],
+        "summary": "Create Message",
+        "description": "Crea un mensaje con Claude. Soporta streaming, system prompts, visión y herramientas.",
+        "operationId": "anthropicMessages",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnthropicMessageRequest"
+              },
+              "examples": {
+                "basic": {
+                  "summary": "Mensaje básico",
+                  "value": {
+                    "model": "claude-sonnet-4-5",
+                    "messages": [
+                      {
+                        "role": "user",
+                        "content": "¿Cuál es la capital de Francia?"
+                      }
+                    ],
+                    "max_tokens": 1024
+                  }
+                },
+                "streaming": {
+                  "summary": "Con streaming",
+                  "value": {
+                    "model": "claude-sonnet-4-5",
+                    "messages": [
+                      {
+                        "role": "user",
+                        "content": "Escribe un poema"
+                      }
+                    ],
+                    "max_tokens": 2048,
+                    "stream": true
+                  }
+                },
+                "vision": {
+                  "summary": "Con imagen",
+                  "value": {
+                    "model": "claude-sonnet-4-5",
+                    "messages": [
+                      {
+                        "role": "user",
+                        "content": [
+                          {
+                            "type": "image",
+                            "source": {
+                              "type": "base64",
+                              "media_type": "image/jpeg",
+                              "data": "..."
+                            }
+                          },
+                          {
+                            "type": "text",
+                            "text": "¿Qué hay en esta imagen?"
+                          }
+                        ]
+                      }
+                    ],
+                    "max_tokens": 1024
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mensaje generado exitosamente"
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado"
+          },
+          "429": {
+            "description": "Límite de tasa excedido"
+          }
+        }
+      }
+    },
+    "/anthropic/models": {
+      "get": {
+        "tags": [
+          "Anthropic"
+        ],
+        "summary": "List Models",
+        "description": "Lista los modelos Claude disponibles.",
+        "operationId": "anthropicListModels",
+        "responses": {
+          "200": {
+            "description": "Lista de modelos Claude",
+            "content": {
+              "application/json": {
+                "example": {
+                  "models": [
+                    {
+                      "id": "claude-sonnet-4-5",
+                      "name": "Claude Sonnet 4.5",
+                      "context_window": 200000
+                    },
+                    {
+                      "id": "claude-3-5-haiku-20241022",
+                      "name": "Claude 3.5 Haiku",
+                      "context_window": 200000
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/firecrawl/scrape": {
+      "post": {
+        "tags": [
+          "Firecrawl"
+        ],
+        "summary": "Scrape URL",
+        "description": "Extrae contenido de una URL en formato markdown, HTML, links o screenshot.",
+        "operationId": "firecrawlScrape",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FirecrawlScrapeRequest"
+              },
+              "examples": {
+                "basic": {
+                  "summary": "Scrape básico",
+                  "value": {
+                    "url": "https://example.com",
+                    "formats": [
+                      "markdown"
+                    ]
+                  }
+                },
+                "advanced": {
+                  "summary": "Con opciones avanzadas",
+                  "value": {
+                    "url": "https://example.com",
+                    "formats": [
+                      "markdown",
+                      "links",
+                      "screenshot"
+                    ],
+                    "onlyMainContent": true,
+                    "waitFor": 3000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Contenido extraído exitosamente",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "markdown": "# Título\n\nContenido...",
+                    "links": [
+                      "https://example.com/page1"
+                    ],
+                    "metadata": {
+                      "title": "Ejemplo",
+                      "description": "..."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/firecrawl/search": {
+      "post": {
+        "tags": [
+          "Firecrawl"
+        ],
+        "summary": "Web Search",
+        "description": "Busca en la web y opcionalmente extrae contenido de los resultados.",
+        "operationId": "firecrawlSearch",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "Consulta de búsqueda"
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "default": 10,
+                    "description": "Número de resultados"
+                  },
+                  "lang": {
+                    "type": "string",
+                    "description": "Código de idioma (es, en, etc.)"
+                  },
+                  "country": {
+                    "type": "string",
+                    "description": "Código de país (ES, US, etc.)"
+                  },
+                  "tbs": {
+                    "type": "string",
+                    "description": "Filtro temporal: qdr:h (hora), qdr:d (día), qdr:w (semana), qdr:m (mes), qdr:y (año)"
+                  },
+                  "scrapeOptions": {
+                    "type": "object",
+                    "description": "Opciones de scraping para cada resultado"
+                  }
+                }
+              },
+              "example": {
+                "query": "inteligencia artificial noticias",
+                "limit": 5,
+                "lang": "es",
+                "tbs": "qdr:w"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultados de búsqueda"
+          }
+        }
+      }
+    },
+    "/firecrawl/map": {
+      "post": {
+        "tags": [
+          "Firecrawl"
+        ],
+        "summary": "Map Website",
+        "description": "Descubre todas las URLs de un sitio web (sitemap rápido).",
+        "operationId": "firecrawlMap",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "url"
+                ],
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "description": "URL del sitio web"
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "default": 5000,
+                    "description": "Máximo de URLs a retornar"
+                  },
+                  "includeSubdomains": {
+                    "type": "boolean",
+                    "description": "Incluir subdominios"
+                  },
+                  "search": {
+                    "type": "string",
+                    "description": "Filtrar URLs que contengan este texto"
+                  }
+                }
+              },
+              "example": {
+                "url": "https://example.com",
+                "limit": 100,
+                "search": "blog"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Lista de URLs del sitio",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "links": [
+                    "https://example.com/",
+                    "https://example.com/blog",
+                    "https://example.com/about"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/firecrawl/crawl": {
+      "post": {
+        "tags": [
+          "Firecrawl"
+        ],
+        "summary": "Start Crawl",
+        "description": "Inicia un crawl asíncrono de múltiples páginas de un sitio web.",
+        "operationId": "firecrawlCrawlStart",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FirecrawlCrawlRequest"
+              },
+              "example": {
+                "url": "https://example.com",
+                "limit": 50,
+                "maxDepth": 3,
+                "includePaths": [
+                  "/blog/*",
+                  "/docs/*"
+                ],
+                "excludePaths": [
+                  "/admin/*"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Crawl iniciado",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "id": "crawl_abc123"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/firecrawl/crawl/{id}": {
+      "get": {
+        "tags": [
+          "Firecrawl"
+        ],
+        "summary": "Get Crawl Status",
+        "description": "Obtiene el estado y resultados de un crawl en progreso.",
+        "operationId": "firecrawlCrawlStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID del crawl"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estado del crawl",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "completed",
+                  "completed": 50,
+                  "total": 50,
+                  "data": [
+                    {
+                      "url": "...",
+                      "markdown": "..."
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Firecrawl"
+        ],
+        "summary": "Cancel Crawl",
+        "description": "Cancela un crawl en progreso.",
+        "operationId": "firecrawlCrawlCancel",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Crawl cancelado"
+          }
+        }
+      }
+    },
+    "/firecrawl/batch-scrape": {
+      "post": {
+        "tags": [
+          "Firecrawl"
+        ],
+        "summary": "Batch Scrape",
+        "description": "Extrae contenido de múltiples URLs en paralelo.",
+        "operationId": "firecrawlBatchScrape",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "urls"
+                ],
+                "properties": {
+                  "urls": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Lista de URLs"
+                  },
+                  "formats": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "onlyMainContent": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "example": {
+                "urls": [
+                  "https://example.com/page1",
+                  "https://example.com/page2"
+                ],
+                "formats": [
+                  "markdown"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Batch iniciado",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "id": "batch_xyz789"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/firecrawl/batch-scrape/{id}": {
+      "get": {
+        "tags": [
+          "Firecrawl"
+        ],
+        "summary": "Get Batch Status",
+        "description": "Obtiene el estado y resultados de un batch scrape.",
+        "operationId": "firecrawlBatchStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estado del batch"
+          }
+        }
+      }
+    },
+    "/firecrawl/extract": {
+      "post": {
+        "tags": [
+          "Firecrawl"
+        ],
+        "summary": "Extract Structured Data",
+        "description": "Extrae datos estructurados de una URL usando un schema.",
+        "operationId": "firecrawlExtract",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "url",
+                  "schema"
+                ],
+                "properties": {
+                  "url": {
+                    "type": "string"
+                  },
+                  "schema": {
+                    "type": "object",
+                    "description": "JSON Schema de los datos a extraer"
+                  },
+                  "prompt": {
+                    "type": "string",
+                    "description": "Prompt adicional para guiar la extracción"
+                  }
+                }
+              },
+              "example": {
+                "url": "https://example.com/product",
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "price": {
+                      "type": "number"
+                    },
+                    "description": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Datos extraídos según el schema"
+          }
+        }
+      }
+    },
+    "/apify/actors/{actorId}/runs": {
+      "post": {
+        "tags": [
+          "Apify"
+        ],
+        "summary": "Run Actor",
+        "description": "Ejecuta un actor de Apify con los parámetros especificados.",
+        "operationId": "apifyRunActor",
+        "parameters": [
+          {
+            "name": "actorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID del actor (ej: apify/web-scraper)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Input del actor según su especificación"
+              },
+              "examples": {
+                "webScraper": {
+                  "summary": "Web Scraper",
+                  "value": {
+                    "startUrls": [
+                      {
+                        "url": "https://example.com"
+                      }
+                    ],
+                    "maxPagesPerCrawl": 10
+                  }
+                },
+                "googleSearch": {
+                  "summary": "Google Search",
+                  "value": {
+                    "queries": "inteligencia artificial",
+                    "maxPagesPerQuery": 1,
+                    "resultsPerPage": 10
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Run iniciado",
+            "content": {
+              "application/json": {
+                "example": {
+                  "id": "run_abc123",
+                  "actId": "apify/web-scraper",
+                  "status": "RUNNING",
+                  "defaultDatasetId": "dataset_xyz"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/apify/actor-runs/{runId}": {
+      "get": {
+        "tags": [
+          "Apify"
+        ],
+        "summary": "Get Run Status",
+        "description": "Obtiene el estado de una ejecución de actor.",
+        "operationId": "apifyGetRunStatus",
+        "parameters": [
+          {
+            "name": "runId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estado de la ejecución",
+            "content": {
+              "application/json": {
+                "example": {
+                  "id": "run_abc123",
+                  "status": "SUCCEEDED",
+                  "finishedAt": "2024-01-15T10:30:00Z",
+                  "defaultDatasetId": "dataset_xyz"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/apify/datasets/{datasetId}/items": {
+      "get": {
+        "tags": [
+          "Apify"
+        ],
+        "summary": "Get Dataset Items",
+        "description": "Obtiene los datos resultantes de un dataset.",
+        "operationId": "apifyGetDatasetItems",
+        "parameters": [
+          {
+            "name": "datasetId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 100
+            },
+            "description": "Máximo de items"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "description": "Offset para paginación"
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "csv",
+                "xlsx"
+              ]
+            },
+            "description": "Formato de salida"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Items del dataset",
+            "content": {
+              "application/json": {
+                "example": [
+                  {
+                    "url": "https://example.com",
+                    "title": "Ejemplo",
+                    "data": {}
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/apify/actor-tasks/{taskId}/runs": {
+      "post": {
+        "tags": [
+          "Apify"
+        ],
+        "summary": "Run Task",
+        "description": "Ejecuta una tarea preconfigurada de Apify.",
+        "operationId": "apifyRunTask",
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID de la tarea"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Override de parámetros (opcional)"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Task ejecutada",
+            "content": {
+              "application/json": {
+                "example": {
+                  "id": "run_task123",
+                  "status": "RUNNING"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/moonshot/chat/completions": {
+      "post": {
+        "tags": [
+          "Moonshot"
+        ],
+        "summary": "Chat Completions",
+        "description": "Chat con modelos Kimi. Soporta contexto largo hasta 128K tokens.",
+        "operationId": "moonshotChatCompletions",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatCompletionRequest"
+              },
+              "examples": {
+                "basic": {
+                  "summary": "Chat básico",
+                  "value": {
+                    "model": "kimi-k2-turbo-preview",
+                    "messages": [
+                      {
+                        "role": "user",
+                        "content": "Hola, ¿qué puedes hacer?"
+                      }
+                    ]
+                  }
+                },
+                "longContext": {
+                  "summary": "Contexto largo",
+                  "value": {
+                    "model": "moonshot-v1-128k",
+                    "messages": [
+                      {
+                        "role": "user",
+                        "content": "Resume este documento largo..."
+                      }
+                    ],
+                    "max_tokens": 4096
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Respuesta de chat"
+          }
+        }
+      }
+    },
+    "/moonshot/models": {
+      "get": {
+        "tags": [
+          "Moonshot"
+        ],
+        "summary": "List Models",
+        "description": "Lista los modelos Kimi/Moonshot disponibles.",
+        "operationId": "moonshotListModels",
+        "responses": {
+          "200": {
+            "description": "Lista de modelos",
+            "content": {
+              "application/json": {
+                "example": {
+                  "data": [
+                    {
+                      "id": "kimi-k2-turbo-preview",
+                      "context_length": 131072
+                    },
+                    {
+                      "id": "moonshot-v1-32k",
+                      "context_length": 32768
+                    },
+                    {
+                      "id": "moonshot-v1-128k",
+                      "context_length": 131072
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/moonshot/tokenizers/estimate-token-count": {
+      "post": {
+        "tags": [
+          "Moonshot"
+        ],
+        "summary": "Estimate Token Count",
+        "description": "Estima el número de tokens en un texto o mensajes.",
+        "operationId": "moonshotEstimateTokens",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "model"
+                ],
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "description": "ID del modelo"
+                  },
+                  "messages": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Message"
+                    },
+                    "description": "Mensajes a estimar"
+                  }
+                }
+              },
+              "example": {
+                "model": "kimi-k2-turbo-preview",
+                "messages": [
+                  {
+                    "role": "user",
+                    "content": "Hola, ¿cuántos tokens tiene este mensaje?"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Estimación de tokens",
+            "content": {
+              "application/json": {
+                "example": {
+                  "data": {
+                    "total_tokens": 15
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/qwen/chat/completions": {
+      "post": {
+        "tags": [
+          "Qwen"
+        ],
+        "summary": "Chat Completions",
+        "description": "Chat con modelos Qwen de Alibaba. Incluye modelos de visión (qwen-vl).",
+        "operationId": "qwenChatCompletions",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatCompletionRequest"
+              },
+              "examples": {
+                "basic": {
+                  "summary": "Chat básico",
+                  "value": {
+                    "model": "qwen-plus",
+                    "messages": [
+                      {
+                        "role": "user",
+                        "content": "Hola"
+                      }
+                    ]
+                  }
+                },
+                "vision": {
+                  "summary": "Con imagen (qwen-vl)",
+                  "value": {
+                    "model": "qwen-vl-plus",
+                    "messages": [
+                      {
+                        "role": "user",
+                        "content": [
+                          {
+                            "type": "image_url",
+                            "image_url": {
+                              "url": "https://example.com/image.jpg"
+                            }
+                          },
+                          {
+                            "type": "text",
+                            "text": "¿Qué hay en esta imagen?"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Respuesta de chat"
+          }
+        }
+      }
+    },
+    "/qwen/models": {
+      "get": {
+        "tags": [
+          "Qwen"
+        ],
+        "summary": "List Models",
+        "description": "Lista los modelos Qwen disponibles.",
+        "operationId": "qwenListModels",
+        "responses": {
+          "200": {
+            "description": "Lista de modelos",
+            "content": {
+              "application/json": {
+                "example": {
+                  "data": [
+                    {
+                      "id": "qwen-turbo",
+                      "description": "Modelo rápido"
+                    },
+                    {
+                      "id": "qwen-plus",
+                      "description": "Modelo equilibrado"
+                    },
+                    {
+                      "id": "qwen-max",
+                      "description": "Modelo más capaz"
+                    },
+                    {
+                      "id": "qwen-vl-plus",
+                      "description": "Modelo con visión"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/people-search": {
+      "post": {
+        "tags": [
+          "PeopleSearch"
+        ],
+        "summary": "Search Person",
+        "description": "Busca información pública de una persona usando IA. Retorna perfil profesional, redes sociales y fuentes.",
+        "operationId": "peopleSearch",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PeopleSearchRequest"
+              },
+              "examples": {
+                "basic": {
+                  "summary": "Búsqueda básica",
+                  "value": {
+                    "name": "Elon Musk"
+                  }
+                },
+                "detailed": {
+                  "summary": "Búsqueda detallada",
+                  "value": {
+                    "name": "Satya Nadella",
+                    "company": "Microsoft",
+                    "role": "CEO",
+                    "additional_context": "Transformación digital e IA"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Perfil encontrado",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "profile": {
+                    "name": "Elon Musk",
+                    "current_role": "CEO, Tesla & SpaceX",
+                    "summary": "Empresario y magnate de negocios...",
+                    "social_links": {
+                      "twitter": "https://twitter.com/elonmusk",
+                      "linkedin": "..."
+                    }
+                  },
+                  "sources": [
+                    "https://...",
+                    "https://..."
+                  ],
+                  "confidence": 0.95
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/research": {
+      "post": {
+        "tags": [
+          "Research"
+        ],
+        "summary": "Deep Research",
+        "description": "Realiza investigación profunda sobre un tema con múltiples fuentes y citaciones verificadas.",
+        "operationId": "deepResearch",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResearchRequest"
+              },
+              "examples": {
+                "basic": {
+                  "summary": "Investigación básica",
+                  "value": {
+                    "query": "¿Cuáles son los últimos avances en fusión nuclear?",
+                    "model": "sonar-pro"
+                  }
+                },
+                "deep": {
+                  "summary": "Investigación profunda",
+                  "value": {
+                    "query": "Impacto económico de la IA generativa en 2024",
+                    "model": "sonar-deep-research",
+                    "search_recency_filter": "month"
+                  }
+                },
+                "academic": {
+                  "summary": "Búsqueda académica",
+                  "value": {
+                    "query": "Transformer architecture improvements",
+                    "model": "sonar-reasoning-pro",
+                    "search_mode": "academic"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Investigación completada",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "research": "Los últimos avances en fusión nuclear incluyen...",
+                  "citations": [
+                    {
+                      "url": "https://...",
+                      "title": "Breakthrough in Fusion",
+                      "snippet": "..."
+                    }
+                  ],
+                  "related_questions": [
+                    "¿Cuándo estará disponible la energía de fusión comercialmente?",
+                    "¿Qué es el proyecto ITER?"
+                  ],
+                  "model_used": "sonar-deep-research",
+                  "tokens_used": 1500
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/structured-output": {
+      "post": {
+        "tags": [
+          "StructuredOutput"
+        ],
+        "summary": "Structured Output",
+        "description": "Extrae datos estructurados de texto o web según un JSON Schema definido.",
+        "operationId": "structuredOutput",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StructuredOutputRequest"
+              },
+              "examples": {
+                "product": {
+                  "summary": "Extraer datos de producto",
+                  "value": {
+                    "query": "iPhone 15 Pro Max tiene una pantalla de 6.7 pulgadas, chip A17 Pro, cámara de 48MP y cuesta desde $1199",
+                    "schema": {
+                      "name": "product_info",
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "screen_size": {
+                            "type": "string"
+                          },
+                          "processor": {
+                            "type": "string"
+                          },
+                          "camera": {
+                            "type": "string"
+                          },
+                          "price": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "entity": {
+                  "summary": "Extracción de entidades",
+                  "value": {
+                    "query": "Apple anunció el nuevo Vision Pro en WWDC 2023. Tim Cook presentó el dispositivo.",
+                    "schema": {
+                      "name": "entities",
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "companies": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "products": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "people": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "events": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Datos estructurados extraídos",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "name": "iPhone 15 Pro Max",
+                    "screen_size": "6.7 inches",
+                    "processor": "A17 Pro",
+                    "camera": "48MP",
+                    "price": 1199
+                  },
+                  "model_used": "sonar-pro"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "API Key",
+        "description": "API Key del sistema IA Gateway (formato: sk_live_xxxxxxxx)"
+      }
+    },
+    "schemas": {
+      "Message": {
+        "type": "object",
+        "required": [
+          "role",
+          "content"
+        ],
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "system",
+              "user",
+              "assistant",
+              "tool"
+            ],
+            "description": "Rol del mensaje"
+          },
+          "content": {
+            "type": "string",
+            "description": "Contenido del mensaje"
+          }
+        }
+      },
+      "ChatCompletionRequest": {
+        "type": "object",
+        "required": [
+          "model",
+          "messages"
+        ],
+        "properties": {
+          "model": {
+            "type": "string",
+            "description": "ID del modelo a usar"
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            }
+          },
+          "max_tokens": {
+            "type": "integer",
+            "description": "Máximo de tokens a generar"
+          },
+          "temperature": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 2,
+            "description": "Temperatura de muestreo"
+          },
+          "top_p": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Nucleus sampling"
+          },
+          "stream": {
+            "type": "boolean",
+            "description": "Habilitar streaming SSE"
+          },
+          "tools": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "Herramientas/funciones disponibles"
+          }
+        }
+      },
+      "ChatCompletionResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string",
+            "example": "chat.completion"
+          },
+          "created": {
+            "type": "integer"
+          },
+          "model": {
+            "type": "string"
+          },
+          "choices": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "index": {
+                  "type": "integer"
+                },
+                "message": {
+                  "$ref": "#/components/schemas/Message"
+                },
+                "finish_reason": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "usage": {
+            "type": "object",
+            "properties": {
+              "prompt_tokens": {
+                "type": "integer"
+              },
+              "completion_tokens": {
+                "type": "integer"
+              },
+              "total_tokens": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      },
+      "ImageGenerationRequest": {
+        "type": "object",
+        "required": [
+          "prompt"
+        ],
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "description": "Descripción de la imagen"
+          },
+          "model": {
+            "type": "string",
+            "enum": [
+              "dall-e-2",
+              "dall-e-3",
+              "gpt-image-1"
+            ]
+          },
+          "n": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "quality": {
+            "type": "string",
+            "enum": [
+              "standard",
+              "hd"
+            ]
+          },
+          "size": {
+            "type": "string",
+            "enum": [
+              "256x256",
+              "512x512",
+              "1024x1024",
+              "1792x1024",
+              "1024x1792"
+            ]
+          },
+          "style": {
+            "type": "string",
+            "enum": [
+              "vivid",
+              "natural"
+            ]
+          }
+        }
+      },
+      "TTSRequest": {
+        "type": "object",
+        "required": [
+          "model",
+          "input",
+          "voice"
+        ],
+        "properties": {
+          "model": {
+            "type": "string",
+            "enum": [
+              "tts-1",
+              "tts-1-hd"
+            ]
+          },
+          "input": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "voice": {
+            "type": "string",
+            "enum": [
+              "alloy",
+              "echo",
+              "fable",
+              "onyx",
+              "nova",
+              "shimmer"
+            ]
+          },
+          "response_format": {
+            "type": "string",
+            "enum": [
+              "mp3",
+              "opus",
+              "aac",
+              "flac",
+              "wav",
+              "pcm"
+            ]
+          },
+          "speed": {
+            "type": "number",
+            "minimum": 0.25,
+            "maximum": 4
+          }
+        }
+      },
+      "EmbeddingRequest": {
+        "type": "object",
+        "required": [
+          "model",
+          "input"
+        ],
+        "properties": {
+          "model": {
+            "type": "string",
+            "enum": [
+              "text-embedding-3-small",
+              "text-embedding-3-large",
+              "text-embedding-ada-002"
+            ]
+          },
+          "input": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ]
+          },
+          "dimensions": {
+            "type": "integer"
+          }
+        }
+      },
+      "AnthropicMessageRequest": {
+        "type": "object",
+        "required": [
+          "model",
+          "messages",
+          "max_tokens"
+        ],
+        "properties": {
+          "model": {
+            "type": "string",
+            "description": "ID del modelo Claude",
+            "example": "claude-sonnet-4-5"
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            }
+          },
+          "max_tokens": {
+            "type": "integer",
+            "description": "Máximo de tokens a generar",
+            "example": 4096
+          },
+          "stream": {
+            "type": "boolean",
+            "description": "Habilitar streaming"
+          },
+          "system": {
+            "type": "string",
+            "description": "System prompt"
+          },
+          "temperature": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "top_p": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        }
+      },
+      "FirecrawlScrapeRequest": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL a extraer"
+          },
+          "formats": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "markdown",
+                "html",
+                "links",
+                "screenshot",
+                "rawHtml"
+              ]
+            },
+            "description": "Formatos de salida"
+          },
+          "onlyMainContent": {
+            "type": "boolean",
+            "description": "Solo contenido principal"
+          },
+          "includeTags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Tags HTML a incluir"
+          },
+          "excludeTags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Tags HTML a excluir"
+          },
+          "waitFor": {
+            "type": "integer",
+            "description": "Milisegundos a esperar"
+          }
+        }
+      },
+      "FirecrawlCrawlRequest": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL inicial del crawl"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Máximo de páginas",
+            "default": 10
+          },
+          "maxDepth": {
+            "type": "integer",
+            "description": "Profundidad máxima"
+          },
+          "includePaths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Patrones de URL a incluir"
+          },
+          "excludePaths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Patrones de URL a excluir"
+          },
+          "scrapeOptions": {
+            "type": "object",
+            "description": "Opciones de scraping por página"
+          }
+        }
+      },
+      "PeopleSearchRequest": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nombre de la persona a buscar"
+          },
+          "location": {
+            "type": "string",
+            "description": "Ciudad o país"
+          },
+          "company": {
+            "type": "string",
+            "description": "Empresa actual o anterior"
+          },
+          "role": {
+            "type": "string",
+            "description": "Cargo o puesto"
+          },
+          "additional_context": {
+            "type": "string",
+            "description": "Información adicional"
+          }
+        }
+      },
+      "ResearchRequest": {
+        "type": "object",
+        "required": [
+          "query"
+        ],
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Pregunta o tema a investigar"
+          },
+          "model": {
+            "type": "string",
+            "enum": [
+              "sonar-deep-research",
+              "sonar-reasoning-pro",
+              "sonar-pro"
+            ],
+            "description": "Modelo de investigación"
+          },
+          "search_domain_filter": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Dominios a filtrar"
+          },
+          "search_recency_filter": {
+            "type": "string",
+            "enum": [
+              "day",
+              "week",
+              "month",
+              "year"
+            ],
+            "description": "Filtro temporal"
+          },
+          "search_mode": {
+            "type": "string",
+            "enum": [
+              "academic",
+              "sec"
+            ],
+            "description": "Modo de búsqueda especializada"
+          }
+        }
+      },
+      "StructuredOutputRequest": {
+        "type": "object",
+        "required": [
+          "query",
+          "schema"
+        ],
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Consulta o texto a analizar"
+          },
+          "schema": {
+            "type": "object",
+            "description": "JSON Schema que define la estructura de salida",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "model": {
+            "type": "string",
+            "description": "Modelo a usar",
+            "default": "sonar-pro"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "code": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

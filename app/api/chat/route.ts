@@ -1,39 +1,36 @@
-import { streamObject } from 'ai';
-import { google } from '@ai-sdk/google';
-import { anthropic } from '@ai-sdk/anthropic';
 import { IPromptInput, PromptRole } from '@/types/message';
 import { withAuth } from '@/lib/with-auth';
-import { stepsSchema } from '@/lib/utils/steps';
-import { createOpenRouter } from '@openrouter/ai-sdk-provider';
-
-const googleModel = google('gemini-2.5-flash-preview-04-17');
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const claudeModel = anthropic('claude-3-7-sonnet-20250219');
-const openrouter = createOpenRouter({
-  apiKey: process.env.OPENROUTER_API_KEY,
-});
-// const claudeModel = anthropic('claude-3-7-sonnet-20250219');
-const openrouterClaude37 = openrouter('anthropic/claude-3.7-sonnet');
-const openrouterClaude35 = openrouter('anthropic/claude-3.5-sonnet');
-const openrouterGooglePro = openrouter('google/gemini-2.5-pro-preview-03-25');
-const openrouterGoogle = openrouter('google/gemini-2.5-pro-preview');
-const openrouterOpenAi = openrouter('openai/gpt-4o-mini');
+import { consumptionChatSteps } from '@/lib/consumption-api/client';
 
 export const POST = withAuth(async (req: Request) => {
   const messages = await req.json();
 
   const allMessages: IPromptInput[] = [...basePrompts, ...messages];
 
-  const result = streamObject({
-    model: googleModel,
-    // model: openrouterOpenAi, // googleModel,
-    output: 'array',
-    system: bluepilotSystemPrompt,
-    schema: stepsSchema,
+  const upstream = await consumptionChatSteps({
     messages: allMessages,
+    metadata: {
+      system: bluepilotSystemPrompt,
+      // Optional hints for your gateway; safe to ignore server-side.
+      expected_output: 'steps_array_json',
+    },
   });
 
-  return result.toTextStreamResponse();
+  if (upstream.kind === 'stream') {
+    return new Response(upstream.stream, {
+      status: 200,
+      headers: {
+        // Keep upstream content-type when provided; fallback to text/plain
+        'Content-Type': upstream.contentType || 'text/plain; charset=utf-8',
+      },
+    });
+  }
+
+  // Non-stream JSON fallback: return as a single text chunk so `useObject` can parse it.
+  return new Response(JSON.stringify(upstream.data), {
+    status: 200,
+    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+  });
 });
 
 const bluepilotSystemPrompt = `You are BluePilot, an elite AI assistant and world-class senior React developer specializing in creating stunning, modern web experiences. Your output combines technical excellence with exceptional design sensibility.
